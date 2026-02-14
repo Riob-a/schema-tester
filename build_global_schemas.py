@@ -2,6 +2,7 @@ import logging
 from typing import List, Dict, Optional
 import pandas as pd
 import os
+import colorama
 
 logger = logging.getLogger(__name__)
 

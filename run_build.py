@@ -5,9 +5,10 @@ import os
 import argparse
 from datetime import datetime
 from collections import defaultdict
+from colorama import init, Fore, Style
 from build_global_schemas import build_global_schemas
 
-
+init(autoreset=True)
 # ---- logging setup ----
 logging.basicConfig(
     level=logging.INFO,
@@ -22,7 +23,7 @@ def safe_input(message: str) -> str:
     value = input(message).strip().lower()
 
     if value in {"exit", "quit", "q"}:
-        print("\n⚠ Execution manually aborted by user.")
+        print(Fore.RED + "\n⚠ Execution manually aborted by user.")
         raise SystemExit(0)
 
     return value
@@ -80,12 +81,12 @@ def main():
 
     # ---- Global escape ----
     if args.escape:
-        print("⚠ Escape flag detected. Stopping execution.")
+        print(Style.BRIGHT + Fore.YELLOW + "⚠ Escape flag detected. Stopping execution.")
         return
 
     # ---- Interactive confirmation for auto mode ----
     if args.mode == "auto" and not args.no_confirm:
-        print("Auto mode will process all .xlsx files in the current folder.")
+        print(Fore.YELLOW + "Auto mode will process all .xlsx files in the current folder.")
 
         confirm = safe_input(
             "Do you want to continue? (y/n) "
@@ -93,7 +94,7 @@ def main():
         )
 
         if confirm != "y":
-            print("Switching to manual mode...")
+            print(Style.BRIGHT + Fore.CYAN + "Switching to manual mode...")
             args.mode = "manual"
 
     # ---- Ask for file path if manual and not provided ----
@@ -120,7 +121,7 @@ def main():
                 last_dir = os.path.dirname(file_input)
                 break
             else:
-                print(f"File not found: {file_input}. Please enter a valid path.")
+                print(Style.BRIGHT + Fore.RED + f"File not found: {file_input}. Please enter a valid path.")
 
     # ---- Prepare Excel files ----
     if args.mode == "manual":
@@ -132,7 +133,7 @@ def main():
     else:
         excel_files = [f for f in glob.glob("*.xlsx") if not f.startswith("~$")]
         if not excel_files:
-            raise FileNotFoundError("No Excel file found in directory for auto mode.")
+            raise FileNotFoundError(Style.BRIGHT + Fore.RED + "No Excel file found in directory for auto mode.")
 
     # ---- Dry run variables ----
     grouped_deployed = defaultdict(list)
@@ -140,7 +141,7 @@ def main():
 
     # ---- Process files ----
     for file_path in excel_files:
-        print(f"\nProcessing: {file_path}")
+        print(Fore.CYAN + f"\nProcessing: {file_path}")
 
         df = pd.read_excel(file_path)
         total_rows += len(df)
@@ -152,15 +153,15 @@ def main():
         grouped_deployed[conservancy].extend(deployed)
 
     # ---- Global summary ----
-    print("\n==============================")
-    print("GLOBAL DRY RUN SUMMARY")
-    print("==============================")
+    print(Fore.MAGENTA + "\n==============================")
+    print(Fore.MAGENTA + "GLOBAL DRY RUN SUMMARY")
+    print(Fore.MAGENTA + "==============================")
 
     total_deployed = sum(len(v) for v in grouped_deployed.values())
 
-    print(f"Total schemas processed: {total_rows}")
-    print(f"Total schemas deployable: {total_deployed}")
-    print("------------------------------")
+    print(Fore.GREEN + f"Total schemas processed: {total_rows}")
+    print(Fore.GREEN + f"Total schemas deployable: {total_deployed}")
+    print(Style.BRIGHT + Fore.MAGENTA + "------------------------------")
     
     # ---- Grouped Results ----
     for conservancy in sorted(grouped_deployed.keys()):
@@ -169,7 +170,7 @@ def main():
         if not schemas:
             continue
 
-        print(f"\n--- {conservancy.upper()} ---")
+        print(Fore.BLUE + f"\n--- {conservancy.upper()} ---")
         print(f"Deployed: {len(schemas)}")
         print("---------------------------")
         
@@ -211,11 +212,11 @@ def main():
 
                 df_out.to_excel(output_path, index=False)
 
-                print(f"Generated: {output_path}")
+                print(Fore.GREEN + f"Generated: {output_path}")
         else:
-            print("\n⚠ Excel generation skipped.")
+            print(Fore.YELLOW + "\n⚠ Excel generation skipped.")
     else:
-        print("\n⚠ No deployable schemas — nothing to write.")
+        print(Fore.YELLOW + "\n⚠ No deployable schemas — nothing to write.")
 
 
 # ---- Graceful Ctrl+C handling ----
@@ -223,5 +224,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n\n⚠ Execution cancelled by user (Ctrl+C).")
+        print(Fore.RED + "\n\n⚠ Execution cancelled by user (Ctrl+C).")
         raise SystemExit(0)
