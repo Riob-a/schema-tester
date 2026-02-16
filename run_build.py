@@ -23,7 +23,7 @@ def safe_input(message: str) -> str:
     value = input(message).strip().lower()
 
     if value in {"exit", "quit", "q"}:
-        print(Fore.RED + "\n⚠ Execution manually aborted by user.")
+        print(Style.BRIGHT + Fore.RED + "\n⚠ Execution manually aborted by user.")
         raise SystemExit(0)
 
     return value
@@ -108,7 +108,7 @@ def main():
             )
 
             if not file_input:
-                print("Please provide a valid Excel file path.")
+                print(Style.BRIGHT + Fore.CYAN + "Please provide a valid Excel file path.")
                 continue
 
             file_input = os.path.expanduser(file_input)
@@ -161,7 +161,7 @@ def main():
 
     print(Fore.GREEN + f"Total schemas processed: {total_rows}")
     print(Fore.GREEN + f"Total schemas deployable: {total_deployed}")
-    print(Style.BRIGHT + Fore.MAGENTA + "------------------------------")
+    print(Fore.MAGENTA + "------------------------------")
     
     # ---- Grouped Results ----
     for conservancy in sorted(grouped_deployed.keys()):
@@ -170,7 +170,7 @@ def main():
         if not schemas:
             continue
 
-        print(Fore.BLUE + f"\n--- {conservancy.upper()} ---")
+        print(Style.BRIGHT + Fore.BLUE + f"\n--- {conservancy.upper()} ---")
         print(f"Deployed: {len(schemas)}")
         print("---------------------------")
         
@@ -224,5 +224,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print(Fore.RED + "\n\n⚠ Execution cancelled by user (Ctrl+C).")
+        print(Style.BRIGHT + Fore.RED + "\n\n⚠ Execution cancelled by user (Ctrl+C).")
         raise SystemExit(0)

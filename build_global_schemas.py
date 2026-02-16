@@ -70,7 +70,6 @@ def build_global_schemas(
     - Only active schemas (event_is_active=True) are considered
     - False or blank event_is_active → skipped
     - System-flagged schemas are excluded from propagation
-    - Borana schema ID always wins
     """
     source_server = os.path.splitext(os.path.basename(file_path))[0]
 
